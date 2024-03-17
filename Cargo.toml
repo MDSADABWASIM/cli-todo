@@ -1,9 +1,17 @@
 [package]
 name = "cli-todo"
+description = "A TODO app for your terminal"
 version = "0.1.0"
 edition = "2021"
+authors = ["Md sadab wasim<sadabwasim@gmail.com>"]
+readme = "README.md"
+repository = "https://github.com/MDSADABWASIM/cli-todo"
+license = "MIT OR Apache-2.0"
+keywords = ["cli-todo", "todo-app"]
+categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+opt-level = 'z'
 
 [dependencies]
 libc = "0.2.153"
