@@ -6,7 +6,7 @@ Simple Interactive Terminal Todo App in Rust. This is meant to be an experimenta
 ## Quick Start
 
 ```console
-$ cargo run TODO
+$ cargo run
 ```
 
 ## Controls
