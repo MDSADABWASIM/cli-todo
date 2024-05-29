@@ -22,3 +22,5 @@ $ cargo run
 |<kbd>q</kbd>|Quit|
 |<kbd>TAB</kbd>|Switch between the TODO and DONE panels|
 |<kbd>Enter</kbd>|Perform an action on the highlighted UI element|
+
+**Made with** :heart: **and Rust**
