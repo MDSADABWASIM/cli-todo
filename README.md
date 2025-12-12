@@ -2,11 +2,43 @@
 
 Simple Interactive Terminal Todo App in Rust. This is meant to be an experimental playground for testing ideas on Immediate TUIs.
 
+## Installation
 
-## Quick Start
+### From crates.io
+
+If you have Rust installed, you can install `clitodo` directly from crates.io:
 
 ```console
-$ cargo run
+$ cargo install cli-todo
+```
+
+### From source
+
+1.  Clone the repository.
+2.  Run the installation script:
+
+```console
+$ ./install.sh
+```
+
+Or manually with cargo:
+
+```console
+$ cargo install --path .
+```
+
+## Usage
+
+Once installed, you can run the application using the `clitodo` command:
+
+```console
+$ clitodo
+```
+
+To see the list of controls, you can use the `--help` flag:
+
+```console
+$ clitodo --help
 ```
 
 ## Controls

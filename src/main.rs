@@ -120,7 +120,34 @@ fn save_state(todos: &[String], dones: &[String], file_path: &PathBuf) {
     }
 }
 
+fn usage() {
+    let usage = "Usage: clitodo [OPTIONS]
+
+Options:
+    --help      Print this help message
+
+Controls:
+    Key         Description
+    k, j        Move cursor up and down
+    Shift+K, J  Drag the current item up and down
+    g, G        Jump to the start, end of the current item list
+    r           Rename the current item
+    i           Insert a new item
+    d           Delete the current list item
+    q           Quit
+    TAB         Switch between the TODO and DONE panels
+    Enter       Perform an action on the highlighted UI element
+";
+    println!("{}", usage);
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.contains(&"--help".to_string()) {
+        usage();
+        process::exit(0);
+    }
+
     ctrlc::init();
 
     let file_path = if let Some(proj_dirs) = ProjectDirs::from("", "", "clitodo") {
