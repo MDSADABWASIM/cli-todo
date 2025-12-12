@@ -1,5 +1,5 @@
 [package]
-name = "cli-todo"
+name = "clitodo"
 description = "A TODO app for your terminal"
 version = "0.1.0"
 edition = "2021"
@@ -15,4 +15,5 @@ opt-level = 'z'
 
 [dependencies]
 libc = "0.2.153"
-ncurses = "5.101.0"
+ncurses = "6.0.1"
+directories = "6.0.0"

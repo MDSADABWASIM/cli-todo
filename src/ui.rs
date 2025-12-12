@@ -53,7 +53,7 @@ impl Ui {
 
         mv(pos.y, pos.x);
         attron(COLOR_PAIR(pair));
-        addstr(text);
+        let _ = addstr(text);
         attroff(COLOR_PAIR(pair));
 
         layout.add_widget(Vec2::new(width, 1));
@@ -113,7 +113,7 @@ impl Ui {
         {
             mv(pos.y, pos.x);
             attron(COLOR_PAIR(REGULAR_PAIR));
-            addstr(buffer);
+            let _ = addstr(buffer);
             attroff(COLOR_PAIR(REGULAR_PAIR));
             layout.add_widget(Vec2::new(width, 1));
         }
@@ -122,7 +122,7 @@ impl Ui {
         {
             mv(pos.y, pos.x + *cursor as i32);
             attron(COLOR_PAIR(HIGHLIGHT_PAIR));
-            addstr(buffer.get(*cursor..=*cursor).unwrap_or(" "));
+            let _ = addstr(buffer.get(*cursor..=*cursor).unwrap_or(" "));
             attroff(COLOR_PAIR(HIGHLIGHT_PAIR));
         }
     }
