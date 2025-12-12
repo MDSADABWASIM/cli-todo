@@ -121,7 +121,7 @@ fn save_state(todos: &[String], dones: &[String], file_path: &PathBuf) {
 }
 
 fn usage() {
-    let usage = "Usage: clitodo [OPTIONS]
+    let usage = "Usage: todo [OPTIONS]
 
 Options:
     --help      Print this help message
@@ -153,7 +153,7 @@ fn main() {
 
     ctrlc::init();
 
-    let file_path = if let Some(proj_dirs) = ProjectDirs::from("", "", "clitodo") {
+    let file_path = if let Some(proj_dirs) = ProjectDirs::from("", "", "todo") {
         let data_dir = proj_dirs.data_dir();
         if !data_dir.exists() {
             if let Err(e) = fs::create_dir_all(data_dir) {

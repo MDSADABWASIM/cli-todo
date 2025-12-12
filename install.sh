@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Installing clitodo..."
+echo "Installing todo..."
 
 # Check if cargo is installed
 if ! command -v cargo &> /dev/null; then
@@ -13,5 +13,5 @@ fi
 # --path . installs from the current directory
 cargo install --path .
 
-echo "clitodo installed successfully!"
-echo "You can now run the application by typing 'clitodo' in your terminal."
+echo "todo installed successfully!"
+echo "You can now run the application by typing 'todo' in your terminal."
