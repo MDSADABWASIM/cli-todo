@@ -6,7 +6,7 @@ Simple Interactive Terminal Todo App in Rust. This is meant to be an experimenta
 
 ### From crates.io
 
-If you have Rust installed, you can install `clitodo` directly from crates.io:
+If you have Rust installed, you can install `todo` directly from crates.io:
 
 ```console
 $ cargo install cli-todo
@@ -29,16 +29,16 @@ $ cargo install --path .
 
 ## Usage
 
-Once installed, you can run the application using the `clitodo` command:
+Once installed, you can run the application using the `todo` command:
 
 ```console
-$ clitodo
+$ todo
 ```
 
 To see the list of controls, you can use the `--help` flag:
 
 ```console
-$ clitodo --help
+$ todo --help
 ```
 
 ## Controls

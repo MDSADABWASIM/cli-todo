@@ -1,7 +1,7 @@
 [package]
 name = "cli-todo"
 description = "A TODO app for your terminal"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Md sadab wasim<sadabwasim@gmail.com>"]
 readme = "README.md"
@@ -14,7 +14,7 @@ categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 opt-level = 'z'
 
 [[bin]]
-name = "clitodo"
+name = "todo"
 path = "src/main.rs"
 
 [dependencies]
