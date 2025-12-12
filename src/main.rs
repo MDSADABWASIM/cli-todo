@@ -1,10 +1,12 @@
 use crate::consts::{HIGHLIGHT_PAIR, REGULAR_PAIR};
 use crate::ui::Ui;
+use directories::ProjectDirs;
 use layout::LayoutKind;
 use ncurses::*;
 use status::Status;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufRead, ErrorKind, Write};
+use std::path::PathBuf;
 use std::process;
 use vec2::Vec2;
 
@@ -85,14 +87,22 @@ fn list_delete(list: &mut Vec<String>, list_curr: &mut usize) {
     }
 }
 
-fn load_state(todos: &mut Vec<String>, dones: &mut Vec<String>, file_path: &str) -> io::Result<()> {
+fn load_state(
+    todos: &mut Vec<String>,
+    dones: &mut Vec<String>,
+    file_path: &PathBuf,
+) -> io::Result<()> {
     let file = File::open(file_path)?;
     for (index, line) in io::BufReader::new(file).lines().enumerate() {
         match parse_item(&line?) {
             Some((Status::Todo, title)) => todos.push(title.to_string()),
             Some((Status::Done, title)) => dones.push(title.to_string()),
             None => {
-                eprintln!("{}:{}: ERROR: ill-formed item line", file_path, index + 1);
+                eprintln!(
+                    "{}:{}: ERROR: ill-formed item line",
+                    file_path.display(),
+                    index + 1
+                );
                 process::exit(1);
             }
         }
@@ -100,7 +110,7 @@ fn load_state(todos: &mut Vec<String>, dones: &mut Vec<String>, file_path: &str)
     Ok(())
 }
 
-fn save_state(todos: &[String], dones: &[String], file_path: &str) {
+fn save_state(todos: &[String], dones: &[String], file_path: &PathBuf) {
     let mut file = File::create(file_path).unwrap();
     for todo in todos.iter() {
         writeln!(file, "TODO: {}", todo).unwrap();
@@ -110,10 +120,51 @@ fn save_state(todos: &[String], dones: &[String], file_path: &str) {
     }
 }
 
+fn usage() {
+    let usage = "Usage: clitodo [OPTIONS]
+
+Options:
+    --help      Print this help message
+
+Controls:
++------------+-------------------------------------------------+
+| Key        | Description                                     |
++------------+-------------------------------------------------+
+| k, j       | Move cursor up and down                         |
+| Shift+K, J | Drag the current item up and down               |
+| g, G       | Jump to the start, end of the current item list |
+| r          | Rename the current item                         |
+| i          | Insert a new item                               |
+| d          | Delete the current list item                    |
+| q          | Quit                                            |
+| TAB        | Switch between the TODO and DONE panels         |
+| Enter      | Perform an action on the highlighted UI element |
++------------+-------------------------------------------------+
+";
+    println!("{}", usage);
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.contains(&"--help".to_string()) {
+        usage();
+        process::exit(0);
+    }
+
     ctrlc::init();
 
-    let file_path = "TODO".to_owned();
+    let file_path = if let Some(proj_dirs) = ProjectDirs::from("", "", "clitodo") {
+        let data_dir = proj_dirs.data_dir();
+        if !data_dir.exists() {
+            if let Err(e) = fs::create_dir_all(data_dir) {
+                eprintln!("Could not create data directory: {}", e);
+                process::exit(1);
+            }
+        }
+        data_dir.join("TODO")
+    } else {
+        PathBuf::from("TODO")
+    };
 
     let mut todos = Vec::<String>::new();
     let mut todo_curr: usize = 0;
@@ -123,14 +174,15 @@ fn main() {
     let mut notification: String;
 
     match load_state(&mut todos, &mut dones, &file_path) {
-        Ok(()) => notification = format!("Loaded file {}", file_path),
+        Ok(()) => notification = format!("Loaded file {}", file_path.display()),
         Err(error) => {
             if error.kind() == ErrorKind::NotFound {
-                notification = format!("New file {}", file_path)
+                notification = format!("New file {}", file_path.display())
             } else {
                 panic!(
                     "Could not load state from file `{}`: {:?}",
-                    file_path, error
+                    file_path.display(),
+                    error
                 );
             }
         }
@@ -328,6 +380,6 @@ fn main() {
     endwin();
 
     save_state(&todos, &dones, &file_path);
-    println!("Saved state to {}", file_path);
+    println!("Saved state to {}", file_path.display());
 }
 
