@@ -1,6 +1,6 @@
 # cli-todo
 
-Simple Interactive Terminal Todo App in Rust. This is meant to be an experimental playground for testing ideas on Immediate TUIs.
+A blazingly fast Rust TUI todo app with Vim keybindings for terminal purists. An experimental playground for Immediate Mode rendering—where every keystroke triggers a full UI rebuild, no state diffing required.
 
 ## Installation
 
