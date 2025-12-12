@@ -127,16 +127,19 @@ Options:
     --help      Print this help message
 
 Controls:
-    Key         Description
-    k, j        Move cursor up and down
-    Shift+K, J  Drag the current item up and down
-    g, G        Jump to the start, end of the current item list
-    r           Rename the current item
-    i           Insert a new item
-    d           Delete the current list item
-    q           Quit
-    TAB         Switch between the TODO and DONE panels
-    Enter       Perform an action on the highlighted UI element
++------------+-------------------------------------------------+
+| Key        | Description                                     |
++------------+-------------------------------------------------+
+| k, j       | Move cursor up and down                         |
+| Shift+K, J | Drag the current item up and down               |
+| g, G       | Jump to the start, end of the current item list |
+| r          | Rename the current item                         |
+| i          | Insert a new item                               |
+| d          | Delete the current list item                    |
+| q          | Quit                                            |
+| TAB        | Switch between the TODO and DONE panels         |
+| Enter      | Perform an action on the highlighted UI element |
++------------+-------------------------------------------------+
 ";
     println!("{}", usage);
 }
