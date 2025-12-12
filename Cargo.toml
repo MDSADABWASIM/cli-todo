@@ -1,5 +1,5 @@
 [package]
-name = "clitodo"
+name = "cli-todo"
 description = "A TODO app for your terminal"
 version = "0.1.0"
 edition = "2021"
@@ -12,6 +12,10 @@ categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 
 [profile.release]
 opt-level = 'z'
+
+[[bin]]
+name = "clitodo"
+path = "src/main.rs"
 
 [dependencies]
 libc = "0.2.153"
