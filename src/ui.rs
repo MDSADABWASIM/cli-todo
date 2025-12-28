@@ -90,7 +90,7 @@ impl Ui {
                         *cursor += 1;
                     }
                 }
-                constants::KEY_BACKSPACE => {
+                constants::KEY_BACKSPACE | 127 => {
                     if *cursor > 0 {
                         *cursor -= 1;
                         if *cursor < buffer.len() {
