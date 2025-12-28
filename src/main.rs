@@ -262,9 +262,8 @@ fn main() {
                                     notification.push_str("What needs to be done?");
                                 }
                                 'd' => {
-                                    notification.push_str(
-                                        "Can't remove items from TODO. Mark it as DONE first.",
-                                    );
+                                    list_delete(&mut todos, &mut todo_curr);
+                                    notification.push_str("Into The Abyss!");
                                 }
                                 'k' => list_up(&mut todo_curr),
                                 'j' => list_down(&todos, &mut todo_curr),
