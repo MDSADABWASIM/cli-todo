@@ -41,18 +41,34 @@ To see the list of controls, you can use the `--help` flag:
 $ todo --help
 ```
 
-## Controls
+## Controls (Vim-style keymaps)
 
+### Navigation
 |Keys|Description|
 |---|---|
 |<kbd>k</kbd>, <kbd>j</kbd>|Move cursor up and down|
-|<kbd>Shift+K</kbd>, <kbd>Shift+J</kbd>|Drag the current item up and down|
-|<kbd>g</kbd>, <kbd>G</kbd> | Jump to the start, end of the current item list|
-|<kbd>r</kbd>|Rename the current item|
-|<kbd>i</kbd>|Insert a new item|
-|<kbd>d</kbd>|Delete the current list item|
-|<kbd>q</kbd>|Quit|
+|<kbd>h</kbd>, <kbd>l</kbd>|Switch between TODO (left) and DONE (right) panels|
+|<kbd>g</kbd>, <kbd>G</kbd>|Jump to the start/end of the current item list|
 |<kbd>TAB</kbd>|Switch between the TODO and DONE panels|
-|<kbd>Enter</kbd>|Perform an action on the highlighted UI element|
+
+### Item Manipulation
+|Keys|Description|
+|---|---|
+|<kbd>K</kbd>, <kbd>J</kbd>|Drag the current item up and down|
+|<kbd>i</kbd>|Insert a new item at cursor position|
+|<kbd>o</kbd>|Insert a new item below cursor (vim style)|
+|<kbd>O</kbd>|Insert a new item above cursor (vim style)|
+|<kbd>r</kbd>|Rename the current item|
+|<kbd>c</kbd>|Change item (clear and enter insert mode)|
+|<kbd>C</kbd>|Change entire line (clear and enter insert mode)|
+|<kbd>d</kbd>, <kbd>x</kbd>|Delete the current list item|
+|<kbd>Enter</kbd>|Move item between TODO and DONE|
+
+### Mode Switching
+|Keys|Description|
+|---|---|
+|<kbd>ESC</kbd>|Exit insert/rename mode (back to normal mode)|
+|<kbd>Enter</kbd>|Confirm edit and exit insert mode|
+|<kbd>q</kbd>|Quit the application|
 
 **Made with** :heart: **and Rust**
