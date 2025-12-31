@@ -126,19 +126,25 @@ fn usage() {
 Options:
     --help      Print this help message
 
-Controls:
+Controls (Vim-style keymaps):
 +------------+-------------------------------------------------+
 | Key        | Description                                     |
 +------------+-------------------------------------------------+
 | k, j       | Move cursor up and down                         |
-| Shift+K, J | Drag the current item up and down               |
+| K, J       | Drag the current item up and down               |
+| h, l       | Switch between TODO (left) and DONE (right)     |
 | g, G       | Jump to the start, end of the current item list |
 | r          | Rename the current item                         |
-| i          | Insert a new item                               |
-| d          | Delete the current list item                    |
+| i          | Insert a new item at cursor position            |
+| o          | Insert a new item below cursor (vim 'o')        |
+| O          | Insert a new item above cursor (vim 'O')        |
+| c          | Change item (clear and enter insert mode)       |
+| C          | Change entire line (clear and enter insert)     |
+| d, x       | Delete the current list item                    |
 | q          | Quit                                            |
 | TAB        | Switch between the TODO and DONE panels         |
-| Enter      | Perform an action on the highlighted UI element |
+| Enter      | Move item between TODO and DONE                 |
+| ESC        | Exit insert/rename mode (back to normal mode)   |
 +------------+-------------------------------------------------+
 ";
     println!("{}", usage);
@@ -227,8 +233,11 @@ fn main() {
                                 if editing {
                                     ui.edit_field(todo, &mut editing_cursor, x / 2);
 
-                                    if let Some('\n') = ui.key.take().map(|x| x as u8 as char) {
-                                        editing = false;
+                                    if let Some(key) = ui.key.take() {
+                                        // Enter or ESC exits insert/rename mode
+                                        if key as u8 as char == '\n' || key == 27 {
+                                            editing = false;
+                                        }
                                     }
                                 } else {
                                     ui.label_fixed_width(
@@ -261,7 +270,41 @@ fn main() {
                                     editing = true;
                                     notification.push_str("What needs to be done?");
                                 }
-                                'd' => {
+                                'o' => {
+                                    // Insert below current item (vim 'o')
+                                    let insert_pos = if todos.is_empty() { 0 } else { todo_curr + 1 };
+                                    todos.insert(insert_pos, String::new());
+                                    todo_curr = insert_pos;
+                                    editing_cursor = 0;
+                                    editing = true;
+                                    notification.push_str("What needs to be done?");
+                                }
+                                'O' => {
+                                    // Insert above current item (vim 'O')
+                                    todos.insert(todo_curr, String::new());
+                                    editing_cursor = 0;
+                                    editing = true;
+                                    notification.push_str("What needs to be done?");
+                                }
+                                'c' => {
+                                    // Change current item (vim 'c' - clear and enter insert mode)
+                                    if todo_curr < todos.len() {
+                                        todos[todo_curr].clear();
+                                        editing_cursor = 0;
+                                        editing = true;
+                                        notification.push_str("Change item...");
+                                    }
+                                }
+                                'C' => {
+                                    // Change entire line (vim 'C' - clear entire item and enter insert mode)
+                                    if todo_curr < todos.len() {
+                                        todos[todo_curr].clear();
+                                        editing_cursor = 0;
+                                        editing = true;
+                                        notification.push_str("Change item...");
+                                    }
+                                }
+                                'd' | 'x' => {
                                     list_delete(&mut todos, &mut todo_curr);
                                     notification.push_str("Into The Abyss!");
                                 }
@@ -273,8 +316,11 @@ fn main() {
                                     list_transfer(&mut dones, &mut todos, &mut todo_curr);
                                     notification.push_str("DONE!")
                                 }
-                                '\t' => {
+                                '\t' | 'l' => {
                                     panel = panel.toggle();
+                                }
+                                'h' => {
+                                    // Already in TODO (left panel), stay here
                                 }
                                 _ => {
                                     ui.key = Some(key);
@@ -299,8 +345,11 @@ fn main() {
                                 if editing {
                                     ui.edit_field(done, &mut editing_cursor, x / 2);
 
-                                    if let Some('\n') = ui.key.take().map(|x| x as u8 as char) {
-                                        editing = false;
+                                    if let Some(key) = ui.key.take() {
+                                        // Enter or ESC exits insert/rename mode
+                                        if key as u8 as char == '\n' || key == 27 {
+                                            editing = false;
+                                        }
                                     }
                                 } else {
                                     ui.label_fixed_width(
@@ -331,12 +380,30 @@ fn main() {
                                 'j' => list_down(&dones, &mut done_curr),
                                 'g' => list_first(&mut done_curr),
                                 'G' => list_last(&dones, &mut done_curr),
-                                'i' => {
+                                'i' | 'o' | 'O' => {
                                     notification.push_str(
                                         "Can't insert new DONE items. Only TODO is allowed.",
                                     );
                                 }
-                                'd' => {
+                                'c' => {
+                                    // Change current item (vim 'c' - clear and enter insert mode)
+                                    if done_curr < dones.len() {
+                                        dones[done_curr].clear();
+                                        editing_cursor = 0;
+                                        editing = true;
+                                        notification.push_str("Change item...");
+                                    }
+                                }
+                                'C' => {
+                                    // Change entire line (vim 'C' - clear entire item and enter insert mode)
+                                    if done_curr < dones.len() {
+                                        dones[done_curr].clear();
+                                        editing_cursor = 0;
+                                        editing = true;
+                                        notification.push_str("Change item...");
+                                    }
+                                }
+                                'd' | 'x' => {
                                     list_delete(&mut dones, &mut done_curr);
                                     notification.push_str("Into The Abyss!");
                                 }
@@ -344,8 +411,11 @@ fn main() {
                                     list_transfer(&mut todos, &mut dones, &mut done_curr);
                                     notification.push_str("No, not done yet...")
                                 }
-                                '\t' => {
+                                '\t' | 'h' => {
                                     panel = panel.toggle();
+                                }
+                                'l' => {
+                                    // Already in DONE (right panel), stay here
                                 }
                                 _ => ui.key = Some(key),
                             }

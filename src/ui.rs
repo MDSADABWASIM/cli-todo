@@ -103,6 +103,10 @@ impl Ui {
                         buffer.remove(*cursor);
                     }
                 }
+                27 => {
+                    // ESC key - pass back to main loop to exit editing mode
+                    self.key = Some(key);
+                }
                 _ => {
                     self.key = Some(key);
                 }
