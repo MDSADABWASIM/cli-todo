@@ -368,11 +368,14 @@ fn main() {
                                     list_transfer(&mut dones, &mut todos, &mut todo_curr);
                                     notification.push_str("DONE!")
                                 }
-                                '\t' | 'l' => {
+                                '\t' => {
                                     panel = panel.toggle();
                                 }
                                 'h' => {
                                     // Already in TODO (left panel), stay here
+                                }
+                                'l' => {
+                                    panel = Status::Done;
                                 }
                                 _ => {
                                     ui.key = Some(key);
@@ -463,8 +466,11 @@ fn main() {
                                     list_transfer(&mut todos, &mut dones, &mut done_curr);
                                     notification.push_str("No, not done yet...")
                                 }
-                                '\t' | 'h' => {
+                                '\t' => {
                                     panel = panel.toggle();
+                                }
+                                'h' => {
+                                    panel = Status::Todo;
                                 }
                                 'l' => {
                                     // Already in DONE (right panel), stay here
