@@ -1,4 +1,6 @@
-use crate::consts::{HIGHLIGHT_PAIR, REGULAR_PAIR};
+use crate::consts::{
+    ACTIVE_PANEL_PAIR, HELP_PAIR, HIGHLIGHT_PAIR, REGULAR_PAIR, SELECTED_ITEM_PAIR,
+};
 use crate::ui::Ui;
 use directories::ProjectDirs;
 use layout::LayoutKind;
@@ -150,6 +152,47 @@ Controls (Vim-style keymaps):
     println!("{}", usage);
 }
 
+fn draw_help(width: i32, height: i32) {
+    let help_rows = [
+        ("Key", "Description"),
+        ("---", "---"),
+        ("k, j", "Move cursor up/down"),
+        ("K, J", "Drag item up/down"),
+        ("h, l, TAB", "Switch panels"),
+        ("g, G", "Jump start/end"),
+        ("r", "Rename item"),
+        ("i", "Insert item"),
+        ("o, O", "Insert below/above"),
+        ("c, C", "Change item/line"),
+        ("d, x", "Delete item"),
+        ("Enter", "Move item"),
+        ("q", "Quit"),
+        ("H", "Close Help"),
+    ];
+
+    let box_width = 60;
+    let box_height = help_rows.len() as i32 + 2;
+    let start_x = (width - box_width) / 2;
+    let start_y = (height - box_height) / 2;
+
+    attron(COLOR_PAIR(HELP_PAIR));
+    for i in 0..box_height {
+        mv(start_y + i, start_x);
+        for _ in 0..box_width {
+            let _ = addstr(" ");
+        }
+    }
+
+    for (i, (key, desc)) in help_rows.iter().enumerate() {
+        let y = start_y + 1 + i as i32;
+        mv(y, start_x + 2);
+        let _ = addstr(key);
+        mv(y, start_x + 20);
+        let _ = addstr(desc);
+    }
+    attroff(COLOR_PAIR(HELP_PAIR));
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.contains(&"--help".to_string()) {
@@ -203,11 +246,15 @@ fn main() {
     start_color();
     init_pair(REGULAR_PAIR, COLOR_WHITE, COLOR_BLACK);
     init_pair(HIGHLIGHT_PAIR, COLOR_BLACK, COLOR_WHITE);
+    init_pair(HELP_PAIR, COLOR_WHITE, COLOR_BLUE);
+    init_pair(SELECTED_ITEM_PAIR, COLOR_CYAN, COLOR_BLACK);
+    init_pair(ACTIVE_PANEL_PAIR, COLOR_GREEN, COLOR_BLACK);
 
     let mut quit = false;
     let mut panel = Status::Todo;
     let mut editing = false;
     let mut editing_cursor = 0;
+    let mut showing_help = false;
 
     let mut ui = Ui::default();
     while !quit && !ctrlc::poll() {
@@ -216,6 +263,11 @@ fn main() {
         let mut x = 0;
         let mut y = 0;
         getmaxyx(stdscr(), &mut y, &mut x);
+
+        let input_key = ui.key;
+        if showing_help {
+            ui.key = None;
+        }
 
         ui.begin(Vec2::new(0, 0), LayoutKind::Vert);
         {
@@ -227,7 +279,7 @@ fn main() {
                 ui.begin_layout(LayoutKind::Vert);
                 {
                     if panel == Status::Todo {
-                        ui.label_fixed_width("TODO", x / 2, HIGHLIGHT_PAIR);
+                        ui.label_fixed_width("TODO", x / 2, ACTIVE_PANEL_PAIR);
                         for (index, todo) in todos.iter_mut().enumerate() {
                             if index == todo_curr {
                                 if editing {
@@ -243,7 +295,7 @@ fn main() {
                                     ui.label_fixed_width(
                                         &format!("- [ ] {}", todo),
                                         x / 2,
-                                        HIGHLIGHT_PAIR,
+                                        SELECTED_ITEM_PAIR,
                                     );
                                     if let Some('r') = ui.key.map(|x| x as u8 as char) {
                                         editing = true;
@@ -316,11 +368,14 @@ fn main() {
                                     list_transfer(&mut dones, &mut todos, &mut todo_curr);
                                     notification.push_str("DONE!")
                                 }
-                                '\t' | 'l' => {
+                                '\t' => {
                                     panel = panel.toggle();
                                 }
                                 'h' => {
                                     // Already in TODO (left panel), stay here
+                                }
+                                'l' => {
+                                    panel = Status::Done;
                                 }
                                 _ => {
                                     ui.key = Some(key);
@@ -339,7 +394,7 @@ fn main() {
                 ui.begin_layout(LayoutKind::Vert);
                 {
                     if panel == Status::Done {
-                        ui.label_fixed_width("DONE", x / 2, HIGHLIGHT_PAIR);
+                        ui.label_fixed_width("DONE", x / 2, ACTIVE_PANEL_PAIR);
                         for (index, done) in dones.iter_mut().enumerate() {
                             if index == done_curr {
                                 if editing {
@@ -355,7 +410,7 @@ fn main() {
                                     ui.label_fixed_width(
                                         &format!("- [x] {}", done),
                                         x / 2,
-                                        HIGHLIGHT_PAIR,
+                                        SELECTED_ITEM_PAIR,
                                     );
                                     if let Some('r') = ui.key.map(|x| x as u8 as char) {
                                         editing = true;
@@ -411,8 +466,11 @@ fn main() {
                                     list_transfer(&mut todos, &mut dones, &mut done_curr);
                                     notification.push_str("No, not done yet...")
                                 }
-                                '\t' | 'h' => {
+                                '\t' => {
                                     panel = panel.toggle();
+                                }
+                                'h' => {
+                                    panel = Status::Todo;
                                 }
                                 'l' => {
                                     // Already in DONE (right panel), stay here
@@ -433,8 +491,20 @@ fn main() {
         }
         ui.end();
 
-        if let Some('q') = ui.key.take().map(|x| x as u8 as char) {
-            quit = true;
+        if showing_help {
+            draw_help(x, y);
+            if let Some(key) = input_key {
+                match key as u8 as char {
+                    'q' | 'H' | '\x1b' => showing_help = false,
+                    _ => {}
+                }
+            }
+        } else if let Some(key) = ui.key.take() {
+            match key as u8 as char {
+                'q' => quit = true,
+                'H' => showing_help = true,
+                _ => {}
+            }
         }
 
         refresh();

@@ -70,5 +70,6 @@ $ todo --help
 |<kbd>ESC</kbd>|Exit insert/rename mode (back to normal mode)|
 |<kbd>Enter</kbd>|Confirm edit and exit insert mode|
 |<kbd>q</kbd>|Quit the application|
+|<kbd>H</kbd>|Show help menu|
 
 **Made with** :heart: **and Rust**
